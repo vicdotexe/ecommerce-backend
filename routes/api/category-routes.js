@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { Category, Product } = require('../../models');
+const { update } = require('../../models/Category');
 
 // The `/api/categories` endpoint
 
@@ -22,7 +23,7 @@ router.get('/:id', async(req, res) => {
   // find one category by its `id` value
   // be sure to include its associated Products
   try{
-    const categoryData = await Category.findByPk(req.params.id);
+    const categoryData = await Category.findByPk(req.params.id,{include:Product});
     if (!categoryData){
       return res.status(404).json({message:"No categories with that ID exist."});
     } 
@@ -46,7 +47,12 @@ router.post('/', async(req, res) => {
 router.put('/:id', async(req, res) => {
   // update a category by its `id` value
   try{
-	
+	const updated = await Category.update(req.body, {where:{id:req.params.id}});
+	console.log(updated);
+	if (!updated[0]){
+		return res.status(404).json({message:"ID doesn't exist, or no new data provided."})
+	}
+	return res.json({message:"Category Updated"})
   }catch(err){
     return res.status(500).json({err:err.message});
   }
@@ -55,7 +61,11 @@ router.put('/:id', async(req, res) => {
 router.delete('/:id', async(req, res) => {
   // delete a category by its `id` value
   try{
-
+	const deleted = await Category.destroy({where:{id:req.params.id}});
+	if (!deleted){
+		return res.status(404).json({message: "Category with that ID doesn't exist."})
+	}
+	return res.json({message:"Category has been deleted."});
   }catch(err){
     return res.status(500).json({err:err.message});
   }
