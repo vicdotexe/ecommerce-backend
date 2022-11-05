@@ -82,39 +82,46 @@ router.post('/', async(req, res) => {
 
 });
 
-// update product
+// update product by id
 router.put('/:id', async(req, res) => {
 
   try{
+    //does it exist?
     const exists = await Product.findByPk(req.params.id);
     if (!exists){
       return res.status(404).json({message:"Product with that ID doesn't exist"});
     }
-    const updated = await Product.update(req.body, {where:{id:req.params.id}});
+
+    //update the product
+    await Product.update(req.body, {where:{id:req.params.id}});
   
+    //if tags array was included
     if (req.body.tagIds){
-      const oldTagsData = await ProductTag.findAll({where:{product_id : req.params.id}});
-      const oldTagsIds = oldTagsData.map((tag)=> tag.get({plain:true}).id);
-      const deleted = await ProductTag.destroy({where: {id:oldTagsIds}});
+      const oldTagsData = await ProductTag.findAll({where:{product_id : req.params.id}}); //get all old productTags
+      const oldTagsIds = oldTagsData.map((tag)=> tag.get({plain:true}).id); //extract their ids
+      await ProductTag.destroy({where: {id:oldTagsIds}}); //delete all of them
   
+      //generate the data for the new productTags FROM THE REQ.BODY
       const newProductTags = req.body.tagIds.map((tag_id)=>{return {
         tag_id:tag_id,
         product_id: req.params.id
       }})
-      const newTagsData = await ProductTag.bulkCreate(newProductTags);
+      await ProductTag.bulkCreate(newProductTags); //bulk create in our database from the 'newProductTags' data we mapped out
     }
   
     const productData = await Product.findByPk(req.params.id, {include:Tag});
     const product = productData.get({plain:true})
     return res.json(product);
+
   }catch(err){
     return res.status(500).json({err:err.message})
   }
 });
 
+// delete product by id
 router.delete('/:id', async(req, res) => {
   const deleted = await Product.destroy({where:{id:req.params.id}});
-  return deleted ? res.status(202).json({message: "Product deleted."}) : res.status(404).json({message:"Product with that ID doesn't exist."})
+  return res.json(deleted);
 });
 
 module.exports = router;

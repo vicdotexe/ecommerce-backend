@@ -3,6 +3,7 @@ const { Tag, Product, ProductTag } = require('../../models');
 
 // The `/api/tags` endpoint
 
+// get all tags
 router.get('/', async(req, res) => {
   // find all tags
   // be sure to include its associated Product data
@@ -20,6 +21,7 @@ router.get('/', async(req, res) => {
 
 });
 
+// get one tag by id
 router.get('/:id', async(req, res) => {
   // find a single tag by its `id`
   // be sure to include its associated Product data
@@ -35,6 +37,7 @@ router.get('/:id', async(req, res) => {
   }
 });
 
+// create a new tag
 router.post('/', async(req, res) => {
   // create a new tag
   try{
@@ -45,28 +48,24 @@ router.post('/', async(req, res) => {
   }
 });
 
+// update a tag by id
 router.put('/:id', async(req, res) => {
   // update a tag's name by its `id` value
   try{
     const updated = await Tag.update(req.body, {where:{id:req.params.id}});
-    if (!updated[0]){
-      return res.status(404).json({message: "Tag ID doesn't exist, or no data was new."})
-    }
-    return res.json({message:"Tag updated."});
+    return res.json(updated);
   }catch(err){
     return res.json({err:err.message});
   }
 
 });
 
+// delete a tag by id
 router.delete('/:id', async(req, res) => {
   // delete on tag by its `id` value
   try{
-    const delted = await Tag.destroy({where:{id:req.params.id}});
-    if (!delted){
-      return res.status(404).json({message:"Tag with that ID doesn't exist."})
-    }
-    return res.json({message:"Tag deleted."})
+    const deleted = await Tag.destroy({where:{id:req.params.id}});
+    return res.json(deleted)
   }catch(err){
     return res.status(500).json({message: err.message});
   }

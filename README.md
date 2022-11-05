@@ -59,7 +59,7 @@ After running the server you can interract with the REST API (through an applica
 | DELETE | /api/categories/{id} | deletes the category of {id} |
 | PUT | /api/categories/{id} | update the category of {id} |
 
-[![Watch the video](/assets/screenshot.PNG)](###)
+[![Watch the video](/assets/screenshot.PNG)](https://drive.google.com/file/d/1Wc5ncqATa009jhxCl3Tg46BxMNw0yb-y/view)
 
 ## Contributing
 Contributions are welcome, contact info is below.
